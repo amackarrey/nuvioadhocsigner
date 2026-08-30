@@ -9,6 +9,27 @@ check whether an app is safe.
 
 Repository: [amackarrey/nuvioadhocsigner](https://github.com/amackarrey/nuvioadhocsigner)
 
+## Quick start
+
+Use this if `Nuvio.app` is already in your Applications folder.
+
+1. Quit Nuvio.
+2. Open **Finder > Applications > Utilities > Terminal**.
+3. Copy the command below, paste it into Terminal, and press Return.
+
+```bash
+curl -fsSL https://raw.githubusercontent.com/amackarrey/nuvioadhocsigner/main/resign_nuvio.sh -o "$HOME/Downloads/resign_nuvio.sh" && bash "$HOME/Downloads/resign_nuvio.sh" && open "/Applications/Nuvio.app"
+```
+
+Wait until Terminal prints `Done.`. The command opens Nuvio only when signing
+finishes successfully.
+
+This command saves the current script in Downloads before running it. You can
+[read the script](https://github.com/amackarrey/nuvioadhocsigner/blob/main/resign_nuvio.sh)
+first.
+
+If Nuvio is not installed yet, follow the full instructions below.
+
 ## Before you start
 
 - These instructions are for macOS.
