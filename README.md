@@ -110,6 +110,10 @@ Done.
 
 The script stops without replacing Nuvio if a safety check fails.
 
+After signing the regular app files, the script also signs the embedded
+TorrServer files used for P2P streaming. Debrid users do not need to do
+anything for this step.
+
 ## Step 5: Open Nuvio
 
 Paste this command into Terminal and press Return:
@@ -188,10 +192,12 @@ This keeps the signed copy instead of deleting it.
 1. Checks that the app is Nuvio by reading its bundle ID.
 2. Creates a temporary copy of the app.
 3. Removes quarantine from the temporary copy.
-4. Re-signs the app with a local ad hoc signature.
-5. Verifies the signed copy.
-6. Moves the original app to `/Applications/Nuvio-original.app`.
-7. Installs the signed copy as `/Applications/Nuvio.app`.
+4. Re-signs the regular macOS executable files.
+5. Extracts and re-signs both macOS TorrServer files inside the application JAR.
+6. Places the TorrServer files back into the JAR and verifies them.
+7. Re-signs and verifies the complete app.
+8. Moves the original app to `/Applications/Nuvio-original.app`.
+9. Installs the signed copy as `/Applications/Nuvio.app`.
 
 The script does not move the original app until the signed copy passes its
 checks. If installation fails, it tries to restore the original automatically.
