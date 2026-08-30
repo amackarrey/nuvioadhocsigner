@@ -1,250 +1,137 @@
-# nuvioadhocsigner
+# Nuvio macOS installer and local signer
 
-This script creates a locally signed copy of `Nuvio.app` so it can run on your
-Mac. It saves the original app as `/Applications/Nuvio-original.app`, then puts
-the signed copy at `/Applications/Nuvio.app`.
+This repository has one script that installs and locally signs `Nuvio.app` on
+macOS. You download the official Nuvio DMG, run one Terminal command, and wait
+for Nuvio to open.
 
-Only use a Nuvio app downloaded from a source you trust. Local signing does not
+The script keeps the original or previously installed app as a backup. It does
+not disable Gatekeeper, SIP, or XProtect.
+
+Only use a Nuvio DMG downloaded from a source you trust. Local signing does not
 check whether an app is safe.
 
-Repository: [amackarrey/nuvioadhocsigner](https://github.com/amackarrey/nuvioadhocsigner)
+## Setup
 
-## Quick start
+### Step 1: Prepare the Nuvio DMG
 
-Use this if `Nuvio.app` is already in your Applications folder.
+This step is required for a new installation from the GitHub release.
 
-1. Quit Nuvio.
-2. Open **Finder > Applications > Utilities > Terminal**.
-3. Copy the command below, paste it into Terminal, and press Return.
+1. Download the macOS DMG from the
+   [official Nuvio Desktop releases](https://github.com/NuvioMedia/NuvioDesktop/releases).
+2. Leave the DMG in your Downloads folder.
+3. Do not open the DMG or drag `Nuvio.app` into Applications. The script handles
+   both parts for you.
+4. Quit Nuvio if it is running.
 
-```bash
-curl -fsSL https://raw.githubusercontent.com/amackarrey/nuvioadhocsigner/main/resign_nuvio.sh -o "$HOME/Downloads/resign_nuvio.sh" && bash "$HOME/Downloads/resign_nuvio.sh" && open "/Applications/Nuvio.app"
-```
+The script removes quarantine from the DMG and mounts it read-only before it
+installs Nuvio. You do not need to run a separate `xattr` command.
 
-Wait until Terminal prints `Done.`. The command opens Nuvio only when signing
-finishes successfully.
+If `Nuvio.app` is already in your Applications folder and you do not want to
+install a new DMG, skip Step 1 and follow [Sign an installed copy](#sign-an-installed-copy).
 
-This command saves the current script in Downloads before running it. You can
-[read the script](https://github.com/amackarrey/nuvioadhocsigner/blob/main/resign_nuvio.sh)
-first.
-
-If Nuvio is not installed yet, follow the full instructions below.
-
-## Before you start
-
-- These instructions are for macOS.
-- Quit Nuvio if it is open.
-- Keep the original backup until the signed app works.
-- Do not run the script twice without moving or restoring the existing backup.
-
-## Step 1: Open the Nuvio DMG
-
-> Already have `Nuvio.app` in **Finder > Applications**? Skip Steps 1 and 2.
-> Start at Step 3.
-
-1. Download the Nuvio DMG from a source you trust.
-2. Open Finder and click **Downloads**.
-3. Double-click the downloaded DMG.
-4. Click **Open** if macOS asks for confirmation.
-5. Wait for the DMG window to appear.
-
-If the DMG does not open, use the [DMG troubleshooting](#dmg-troubleshooting)
-section below.
-
-## Step 2: Drag Nuvio into Applications
-
-1. Find `Nuvio.app` in the DMG window.
-2. Drag `Nuvio.app` onto the **Applications** folder shown in that window.
-3. Wait for the copy to finish.
-4. Eject the Nuvio disk image from the Finder sidebar.
-5. Open **Finder > Applications** and check that `Nuvio.app` is there.
-6. Do not open Nuvio yet.
-
-## Step 3: Download the signer
-
-Choose one method. Use Git if it is already installed. Otherwise, use the ZIP
-method.
-
-### Option A: Use Git
+### Step 2: Run the installer and signer
 
 1. Open **Finder > Applications > Utilities > Terminal**.
-2. Copy the command below.
-3. Paste it into Terminal and press Return.
+2. Paste this command and press Return:
 
 ```bash
-cd "$HOME/Downloads" && git clone https://github.com/amackarrey/nuvioadhocsigner.git && cd nuvioadhocsigner
+curl -fsSL https://raw.githubusercontent.com/amackarrey/nuvioadhocsigner/main/resign_nuvio.sh -o "$HOME/Downloads/install_nuvio.sh" && bash "$HOME/Downloads/install_nuvio.sh"
 ```
 
-This downloads the signer into your Downloads folder and opens that folder in
-Terminal.
+This one command downloads the signer from this repository and runs it. The
+script then:
 
-If Terminal says `destination path already exists`, run this instead:
+- Finds the newest Nuvio DMG in Downloads.
+- Removes quarantine from that DMG and mounts it read-only.
+- Checks the Nuvio bundle ID before making changes.
+- Copies, locally signs, and verifies the app.
+- Keeps a backup in Applications.
+- Opens Nuvio when installation succeeds.
+
+Wait for Terminal to print `Done.`. If a check fails, the script stops and
+keeps the previous app.
+
+You can [read the script](https://github.com/amackarrey/nuvioadhocsigner/blob/main/resign_nuvio.sh)
+before running it.
+
+## Choose a specific DMG
+
+If Downloads contains more than one Nuvio DMG, pass the exact file to the
+script:
 
 ```bash
-cd "$HOME/Downloads/nuvioadhocsigner" && git pull
+bash "$HOME/Downloads/install_nuvio.sh" "/path/to/Nuvio-macOS-arm64-version.dmg"
 ```
 
-If macOS asks to install command line developer tools, follow the prompt. Run
-the Git command again after the installation finishes.
+You can type `bash "$HOME/Downloads/install_nuvio.sh" ` with a space at the
+end, drag the DMG into Terminal, and press Return.
 
-### Option B: Download the ZIP
+## Sign an installed copy
 
-1. Click [Download nuvioadhocsigner as a ZIP](https://github.com/amackarrey/nuvioadhocsigner/archive/refs/heads/main.zip).
-2. Open Finder and click **Downloads**.
-3. Double-click `nuvioadhocsigner-main.zip`. Your browser may have already
-   extracted it.
-4. Open Terminal.
-5. Type `cd` followed by one space. Do not press Return yet.
-6. Drag the `nuvioadhocsigner-main` folder from Finder into Terminal.
-7. Press Return.
-
-After using either method, run:
+If `Nuvio.app` is already in Applications, quit Nuvio and run this command. It
+downloads the signer and selects the installed app directly, even if an old
+Nuvio DMG is still in Downloads.
 
 ```bash
-ls
+curl -fsSL https://raw.githubusercontent.com/amackarrey/nuvioadhocsigner/main/resign_nuvio.sh -o "$HOME/Downloads/install_nuvio.sh" && bash "$HOME/Downloads/install_nuvio.sh" "/Applications/Nuvio.app"
 ```
 
-You should see these two files:
+## Backups
 
-```text
-README.md
-resign_nuvio.sh
-```
-
-## Step 4: Run the signer
-
-Make sure Nuvio is closed. Copy these three lines, paste them into Terminal,
-and press Return:
-
-```bash
-chmod +x ./resign_nuvio.sh
-xattr -d com.apple.quarantine ./resign_nuvio.sh 2>/dev/null || true
-./resign_nuvio.sh
-```
-
-The process may take a little while. Keep Terminal open and wait until it
-prints:
-
-```text
-Done.
-```
-
-The script stops without replacing Nuvio if a safety check fails.
-
-After signing the regular app files, the script also signs the embedded
-TorrServer files used for P2P streaming. Debrid users do not need to do
-anything for this step.
-
-## Step 5: Open Nuvio
-
-Paste this command into Terminal and press Return:
-
-```bash
-open "/Applications/Nuvio.app"
-```
-
-The signed app is now `/Applications/Nuvio.app`. The app from before signing is
-saved here:
+The first backup uses this path:
 
 ```text
 /Applications/Nuvio-original.app
 ```
 
-Keep that backup until you are sure the signed app works.
+If that path already exists, the script uses
+`/Applications/Nuvio-original-2.app`, then `Nuvio-original-3.app`, and so on.
+It does not overwrite an existing backup.
 
-## DMG troubleshooting
-
-Try this first:
-
-1. Hold Control and click the DMG in Finder.
-2. Click **Open**.
-3. Click **Open** again if macOS asks.
-
-If it still does not open:
-
-1. Rename the downloaded DMG to `Nuvio.dmg`.
-2. Open Terminal.
-3. Paste these commands one at a time:
-
-```bash
-xattr -d com.apple.quarantine "$HOME/Downloads/Nuvio.dmg" 2>/dev/null || true
-open "$HOME/Downloads/Nuvio.dmg"
-```
-
-No output from the first command is normal. The second command should open the
-DMG. Continue with Step 2.
-
-Do not use `chmod +x` on a DMG. A DMG is a disk image, not a program.
-
-## Common errors
-
-`Source app does not exist`
-
-`Nuvio.app` is not in the Applications folder. Return to Step 2.
-
-`Backup path already exists`
-
-The script found `/Applications/Nuvio-original.app` from an earlier run. Do not
-delete it unless you are certain you no longer need the original app. Move it
-somewhere safe or restore it before running the script again.
-
-`Permission denied`
-
-Make sure Terminal is inside the signer folder, then run:
-
-```bash
-chmod +x ./resign_nuvio.sh
-```
-
-## Restore the original app
-
-You can restore the original app in Finder:
+To restore a backup:
 
 1. Quit Nuvio.
 2. Open the Applications folder.
 3. Rename `Nuvio.app` to `Nuvio-signed.app`.
-4. Rename `Nuvio-original.app` to `Nuvio.app`.
+4. Rename the backup you want to restore to `Nuvio.app`.
 5. Open `Nuvio.app`.
 
-This keeps the signed copy instead of deleting it.
+## Common errors
 
-## What the script does
+`Nuvio is running`
 
-1. Checks that the app is Nuvio by reading its bundle ID.
-2. Creates a temporary copy of the app.
-3. Removes quarantine from the temporary copy.
-4. Re-signs the regular macOS executable files.
-5. Extracts and re-signs both macOS TorrServer files inside the application JAR.
-6. Places the TorrServer files back into the JAR and verifies them.
-7. Re-signs and verifies the complete app.
-8. Moves the original app to `/Applications/Nuvio-original.app`.
-9. Installs the signed copy as `/Applications/Nuvio.app`.
+Quit Nuvio and run the same command again.
 
-The script does not move the original app until the signed copy passes its
-checks. If installation fails, it tries to restore the original automatically.
+`The Nuvio DMG could not be mounted`
 
-## Technical defaults
+Delete the incomplete DMG, download it again from the official release page,
+and rerun the command.
 
-- Installed app: `/Applications/Nuvio.app`
-- Original backup: `/Applications/Nuvio-original.app`
-- Expected bundle ID: `com.nuvio.media.desktop`
-- Old Team ID: `8QBDZ766S3`
+`Expected one Nuvio app in the DMG`
 
-You can provide different source and backup paths:
+The selected DMG does not contain the expected app. Download the macOS DMG
+from the official Nuvio release page.
 
-```bash
-./resign_nuvio.sh \
-  "/Applications/Nuvio.app" \
-  "/Applications/Nuvio-original.app"
-```
+`Permission denied`
 
-Both paths must be absolute, different, and end with `.app`.
+The current account cannot write to the Applications folder. Sign in with an
+administrator account and run the same command again.
+
+## What the script changes
+
+The script validates the bundle ID `com.nuvio.media.desktop`, creates a
+temporary copy, and removes quarantine from that copy. It re-signs regular
+macOS executables that use the old Nuvio Team ID and re-signs the embedded
+TorrServer binaries inside the application JAR. It then verifies the complete
+app before replacing the installed copy.
+
+If installation fails after the previous app was moved, the script tries to
+restore it automatically.
 
 ## Limits
 
-- The new signature is for local use only.
+- The signature is for local use.
 - The script does not notarize Nuvio.
-- The script does not disable Gatekeeper, SIP, or XProtect.
 - A future Nuvio update may replace the signed app.
 - This repository does not contain or distribute Nuvio.
 
@@ -253,5 +140,4 @@ This project is unofficial and is not affiliated with Nuvio or Apple.
 ## Credits
 
 This project was adapted from
-[mournami/resign-rave-macos](https://github.com/mournami/resign-rave-macos)
-and written with help from AI.
+[mournami/resign-rave-macos](https://github.com/mournami/resign-rave-macos).
